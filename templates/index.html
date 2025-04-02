@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-section">
+    <h2 class="section-title">Welcome to E-Cycle AI</h2>
+    <p class="text-center mb-4">Transform your electronic waste into a sustainable future with our AI-powered recycling platform.</p>
+</section>
+
+<section class="features">
+    <h3 class="text-center mb-4">Features</h3>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="feature-card">
+                <h4>🤖 AI Recognition</h4>
+                <p>Instantly identify and analyze your e-waste devices</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <h4>🔧 Repair Assistant</h4>
+                <p>Get step-by-step repair guides for common issues</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <h4>🔗 Blockchain Tracking</h4>
+                <p>Track your recycled items on the blockchain</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="stats-container">
+    <div class="row text-center">
+        <div class="col-md-4">
+            <h3>1,234</h3>
+            <p>Devices Recycled</p>
+        </div>
+        <div class="col-md-4">
+            <h3>2.5 tons</h3>
+            <p>CO2 Saved</p>
+        </div>
+        <div class="col-md-4">
+            <h3>567</h3>
+            <p>Active Users</p>
+        </div>
+    </div>
+</section>
+
+<section class="quick-links mt-5">
+    <h3 class="text-center mb-4">Quick Links</h3>
+    <div class="row">
+        <div class="col-md-4">
+            <a href="/scan" class="btn btn-primary w-100 mb-3">📱 Scan Device</a>
+        </div>
+        <div class="col-md-4">
+            <a href="/centers" class="btn btn-primary w-100 mb-3">🗺️ Find Centers</a>
+        </div>
+        <div class="col-md-4">
+            <a href="/rewards" class="btn btn-primary w-100 mb-3">🎁 View Rewards</a>
+        </div>
+    </div>
+</section>
+
+<section class="newsletter mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h4>Stay Updated</h4>
+            <p>Subscribe to our newsletter for the latest updates on e-waste management and sustainability.</p>
+        </div>
+        <div class="col-md-4">
+            <div class="input-group">
+                <input type="email" class="form-control" placeholder="Email Address">
+                <button class="btn btn-primary">Subscribe</button>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

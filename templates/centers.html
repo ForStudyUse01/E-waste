@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="centers-section">
+    <h2 class="section-title">Recycling Centers</h2>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="feature-card">
+                <h4>🏢 EcoTech Recycling</h4>
+                <p><strong>Address:</strong> 123 Green Street</p>
+                <p><strong>Rating:</strong> ⭐⭐⭐⭐⭐</p>
+                <p><strong>Hours:</strong> Mon-Sat, 9AM-6PM</p>
+                <button class="btn btn-primary" onclick="showDirections('EcoTech Recycling')">Get Directions</button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="feature-card">
+                <h4>🏢 GreenCycle Hub</h4>
+                <p><strong>Address:</strong> 456 Sustainable Ave</p>
+                <p><strong>Rating:</strong> ⭐⭐⭐⭐</p>
+                <p><strong>Hours:</strong> Mon-Fri, 8AM-5PM</p>
+                <button class="btn btn-primary" onclick="showDirections('GreenCycle Hub')">Get Directions</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="feature-card mt-4">
+        <h4>Map View</h4>
+        <div id="map" style="height: 400px; background-color: #eee; border-radius: 10px;">
+            <div class="text-center p-5">
+                <p>Google Maps with nearby recycling centers will load here</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function showDirections(center) {
+        alert(`Directions to ${center} will be shown on the map`);
+        // In a real implementation, this would integrate with Google Maps API
+    }
+</script>
+{% endblock %} 

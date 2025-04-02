@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="rewards-section">
+    <h2 class="section-title">🎁 Rewards Center</h2>
+    
+    <div class="feature-card mb-4">
+        <h4>Your Current Points: <span id="points-display">{{ points }}</span> 🌟</h4>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="feature-card">
+                <h4>🌱 Eco-Friendly Water Bottle</h4>
+                <p><strong>Points Required:</strong> 200</p>
+                <p>Sustainable, BPA-free water bottle</p>
+                <button class="btn btn-primary w-100" onclick="redeemReward('Eco-Friendly Water Bottle', 200)">Redeem</button>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <h4>🛍️ Reusable Shopping Bag</h4>
+                <p><strong>Points Required:</strong> 150</p>
+                <p>Durable shopping bag made from recycled materials</p>
+                <button class="btn btn-primary w-100" onclick="redeemReward('Reusable Shopping Bag', 150)">Redeem</button>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <h4>🌿 Plant a Tree</h4>
+                <p><strong>Points Required:</strong> 100</p>
+                <p>We'll plant a tree in your name!</p>
+                <button class="btn btn-primary w-100" onclick="redeemReward('Plant a Tree', 100)">Redeem</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="feature-card mt-4">
+        <h4>Your Reward History 📜</h4>
+        {% if redeemed_rewards %}
+            <ul class="list-unstyled">
+                {% for reward in redeemed_rewards %}
+                    <li>✅ {{ reward }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No rewards redeemed yet. Start recycling to earn points!</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function redeemReward(name, points) {
+        fetch('/redeem_reward', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: name,
+                points: points
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                document.getElementById('points-display').textContent = data.points;
+                location.reload(); // Refresh to update reward history
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error redeeming reward. Please try again.');
+        });
+    }
+</script>
+{% endblock %} 

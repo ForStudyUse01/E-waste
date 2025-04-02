@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block head %}
+<!-- Add Three.js dependencies -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="{{ url_for('static', filename='js/three-components.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1>Scan E-Waste</h1>
+            <p class="lead">Upload a photo of your electronic device for analysis</p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Upload E-Waste Image</h5>
+                </div>
+                <div class="card-body">
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Select Image</label>
+                            <input type="file" class="form-control" id="file" name="file" accept="image/*" required>
+                        </div>
+                        <div class="mb-3">
+                            <div id="imagePreview" class="image-preview-container">
+                                <img id="preview" class="preview-image" src="" alt="Preview" style="display: none;">
+                                <div class="preview-placeholder">
+                                    <i class="fas fa-camera"></i>
+                                    <p>Preview will appear here</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Analyze Device</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Analysis Results -->
+            <div class="card mt-4" id="analysisResults" style="display: none;">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Analysis Results</h5>
+                </div>
+                <div class="card-body">
+                    <div id="deviceInfo"></div>
+                    <div class="mt-3">
+                        <button class="btn btn-success" id="confirmCollection" style="display: none;">
+                            Confirm Collection
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reward Chart Section -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Reward Points Chart</h5>
+                </div>
+                <div class="card-body">
+                    <pre class="reward-chart">{{ reward_chart }}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .upload-section {
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .upload-section:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .upload-area {
+        padding: 2rem;
+        border: 2px dashed #4CAF50;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .upload-area:hover {
+        background: rgba(76, 175, 80, 0.05);
+        border-color: #45a049;
+    }
+
+    .upload-area i {
+        font-size: 3rem;
+        color: #4CAF50;
+        margin-bottom: 1rem;
+    }
+
+    .preview-section {
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1rem;
+        min-height: 400px;
+        position: relative;
+    }
+
+    .preview-container {
+        position: relative;
+        width: 100%;
+        height: 300px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .preview-image {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .preview-overlay {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 2;
+    }
+
+    .preview-info {
+        background: #f8f9fa;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+    }
+
+    .device-info {
+        background: #ffffff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        margin-top: 1rem;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #4CAF50;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .reward-chart {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        font-family: monospace;
+        white-space: pre-wrap;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    #deviceInfo {
+        margin-bottom: 15px;
+    }
+
+    .device-info-item {
+        margin-bottom: 10px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+    }
+
+    .device-info-item strong {
+        color: #28a745;
+    }
+
+    .error-message {
+        color: #dc3545;
+        padding: 10px;
+        background-color: #f8d7da;
+        border-radius: 5px;
+        margin-bottom: 15px;
+    }
+
+    .image-preview-container {
+        width: 100%;
+        height: 300px;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background-color: #f8f9fa;
+        position: relative;
+    }
+
+    .preview-placeholder {
+        text-align: center;
+        color: #6c757d;
+    }
+
+    .preview-placeholder i {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+
+    .preview-placeholder p {
+        margin: 0;
+    }
+
+    .device-info {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .device-info h6 {
+        color: #495057;
+        margin-bottom: 10px;
+    }
+
+    .alert {
+        margin-top: 15px;
+    }
+
+    #confirmCollection {
+        width: 100%;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadForm = document.getElementById('uploadForm');
+    const analysisResults = document.getElementById('analysisResults');
+    const deviceInfo = document.getElementById('deviceInfo');
+    const confirmCollectionBtn = document.getElementById('confirmCollection');
+    const fileInput = document.getElementById('file');
+    const preview = document.getElementById('preview');
+    const previewPlaceholder = document.querySelector('.preview-placeholder');
+
+    // Image preview functionality
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                previewPlaceholder.style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Form submission
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        const file = fileInput.files[0];
+        
+        if (!file) {
+            showError('Please select an image file');
+            return;
+        }
+        
+        formData.append('file', file);
+        
+        // Show loading state
+        analysisResults.style.display = 'none';
+        confirmCollectionBtn.style.display = 'none';
+        
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showError(data.error);
+                return;
+            }
+            
+            if (data.success) {
+                displayAnalysisResults(data.device_info);
+                analysisResults.style.display = 'block';
+                confirmCollectionBtn.style.display = 'block';
+            } else {
+                showError('Analysis failed. Please try again.');
+            }
+        })
+        .catch(error => {
+            showError('An error occurred. Please try again.');
+            console.error('Error:', error);
+        });
+    });
+
+    // Display analysis results
+    function displayAnalysisResults(info) {
+        deviceInfo.innerHTML = `
+            <div class="device-info-item">
+                <strong>Device Type:</strong> ${info.Device_Type}
+            </div>
+            <div class="device-info-item">
+                <strong>Condition:</strong> ${info.Condition}
+            </div>
+            <div class="device-info-item">
+                <strong>Potential Points:</strong> ${info.Potential_Points}
+            </div>
+            <div class="device-info-item">
+                <strong>Status:</strong> ${info.Status}
+            </div>
+        `;
+    }
+
+    // Show error message
+    function showError(message) {
+        deviceInfo.innerHTML = `
+            <div class="error-message">
+                ${message}
+            </div>
+        `;
+        analysisResults.style.display = 'block';
+        confirmCollectionBtn.style.display = 'none';
+    }
+
+    // Confirm collection handler
+    confirmCollectionBtn.addEventListener('click', function() {
+        const points = parseInt(deviceInfo.querySelector('.device-info-item:nth-child(3)').textContent.split(':')[1]);
+        
+        fetch('/confirm_collection', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                device_id: Date.now().toString(),
+                points: points
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                // Reset form
+                uploadForm.reset();
+                preview.style.display = 'none';
+                previewPlaceholder.style.display = 'block';
+                analysisResults.style.display = 'none';
+                confirmCollectionBtn.style.display = 'none';
+            } else {
+                showError(data.message);
+            }
+        })
+        .catch(error => {
+            showError('An error occurred. Please try again.');
+            console.error('Error:', error);
+        });
+    });
+});
+</script>
+{% endblock %} 
